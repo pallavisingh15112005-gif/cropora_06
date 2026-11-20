@@ -63,6 +63,13 @@ def api_key() -> str:
     return _secret("DATA_GOV_API_KEY")
 
 
+def _redact(text: str) -> str:
+    key = api_key()
+    if key:
+        text = text.replace(key, "***")
+    return re.sub(r"(api-key=)[^&\s)]+", r"\1***", text)
+
+
 def is_configured() -> bool:
     return bool(api_key())
 
@@ -349,12 +356,13 @@ def sync_live_prices() -> dict:
             "price_date": str(mapped["price_date"].max().date()),
         }
     except Exception as exc:
+        message = _redact(str(exc))
         try:
             with db.connect() as conn:
-                db.meta_set(conn, "live_last_error", str(exc)[:400])
+                db.meta_set(conn, "live_last_error", message[:400])
         except Exception:
             pass
-        return {"ok": False, "configured": True, "message": str(exc)}
+        return {"ok": False, "configured": True, "message": message}
 
 
 def load_live_prices() -> pd.DataFrame:
@@ -408,7 +416,7 @@ def get_status() -> dict:
         "configured": is_configured(),
         "backend": db.backend_label(),
         "last_sync": db.meta_get("live_last_sync"),
-        "last_error": db.meta_get("live_last_error"),
+        "last_error": _redact(db.meta_get("live_last_error")),
         "rows": 0,
         "commodities": 0,
         "mandis": 0,
