@@ -12,11 +12,14 @@ import os
 import re
 import time
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 import requests
 
 import db
+
+SNAPSHOT_PATH = Path(__file__).resolve().parent / "data" / "live_snapshot.json"
 
 RESOURCE_ID = os.getenv(
     "DATA_GOV_RESOURCE_ID", "9ef84268-d588-465a-a308-a864a43d0070"
@@ -72,6 +75,20 @@ def _redact(text: str) -> str:
 
 def is_configured() -> bool:
     return bool(api_key())
+
+
+def _load_snapshot() -> tuple[pd.DataFrame, str | None]:
+    try:
+        payload = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
+        df = pd.DataFrame(payload.get("rows") or [], columns=LIVE_COLS)
+    except (OSError, ValueError):
+        return pd.DataFrame(columns=LIVE_COLS), None
+    if df.empty:
+        return df, None
+    df["price_date"] = pd.to_datetime(df["price_date"])
+    for col in ("min_price", "max_price", "modal_price", "variety_count"):
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df, payload.get("synced_at")
 
 
 def _norm(value: object) -> str:
@@ -357,6 +374,17 @@ def sync_live_prices() -> dict:
         }
     except Exception as exc:
         message = _redact(str(exc))
+        lowered = message.lower()
+        if any(
+            part in lowered
+            for part in ("no route to host", "connection refused", "timed out", "timeout")
+        ):
+            message += (
+                " - data.gov.in only accepts requests from Indian networks, so cloud "
+                "deployments cannot fetch directly. They show the bundled snapshot; "
+                "refresh it with `python scripts/export_live_snapshot.py` from an "
+                "Indian network and push the commit."
+            )
         try:
             with db.connect() as conn:
                 db.meta_set(conn, "live_last_error", message[:400])
@@ -366,17 +394,19 @@ def sync_live_prices() -> dict:
 
 
 def load_live_prices() -> pd.DataFrame:
-    """All cached live rows, oldest first. Empty if Turso is unavailable."""
+    """Cached live rows, falling back to the bundled snapshot. Oldest first."""
+    df = pd.DataFrame(columns=LIVE_COLS)
     try:
         with db.connect() as conn:
             rows = conn.execute(
                 f"SELECT {','.join(LIVE_COLS)} FROM live_prices ORDER BY price_date"
             ).fetchall()
+        df = pd.DataFrame(rows, columns=LIVE_COLS)
     except Exception:
-        return pd.DataFrame(columns=LIVE_COLS)
-    df = pd.DataFrame(rows, columns=LIVE_COLS)
+        pass
     if df.empty:
-        return df
+        snapshot, _ = _load_snapshot()
+        return snapshot
     df["price_date"] = pd.to_datetime(df["price_date"])
     for col in ("min_price", "max_price", "modal_price", "variety_count"):
         df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -412,6 +442,7 @@ def load_latest_live() -> pd.DataFrame:
 
 
 def get_status() -> dict:
+    snapshot, snapshot_synced = _load_snapshot()
     status = {
         "configured": is_configured(),
         "backend": db.backend_label(),
@@ -422,6 +453,8 @@ def get_status() -> dict:
         "mandis": 0,
         "latest_date": None,
         "db_error": "",
+        "snapshot": False,
+        "snapshot_synced_at": snapshot_synced,
     }
     try:
         with db.connect() as conn:
@@ -436,4 +469,10 @@ def get_status() -> dict:
             status["latest_date"] = row[3]
     except Exception as exc:
         status["db_error"] = str(exc)
+    if status["rows"] == 0 and not snapshot.empty:
+        status["rows"] = int(len(snapshot))
+        status["commodities"] = int(snapshot["commodity"].nunique())
+        status["mandis"] = int(snapshot["mandi_id"].nunique())
+        status["latest_date"] = str(snapshot["price_date"].max().date())
+        status["snapshot"] = True
     return status
