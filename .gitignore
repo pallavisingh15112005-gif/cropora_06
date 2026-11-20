@@ -1,0 +1,7 @@
+.streamlit/secrets.toml
+__pycache__/
+*.py[cod]
+data/cropora.db
+data/alerts.db
+vibe_images/
+*.log

@@ -1,0 +1,14 @@
+commodity,category,base_price,season_note
+Wheat,Crop,2450,Rabi crop; harvested Mar-Apr
+Paddy (Rice),Crop,2250,Kharif crop; harvested Oct-Nov
+Maize,Crop,2100,Kharif and rabi; peak arrival Sep-Oct
+Soybean,Crop,4700,Kharif crop; harvested Oct
+Cotton,Crop,7300,Kharif crop; picking Oct-Jan
+Onion,Crop,1850,Rabi harvest Mar-Apr; storage crop
+Tomato,Crop,1600,Year-round; peak supply Dec-Feb
+Potato,Crop,1450,Rabi crop; harvested Jan-Feb
+Banana,Fruit,1900,Year-round harvest
+Mango,Fruit,6200,Summer crop; harvested Apr-Jun
+Apple,Fruit,8200,Autumn crop; harvested Sep-Nov
+Grapes,Fruit,5600,Harvested Feb-Apr
+Orange,Fruit,4100,Harvested Nov-Jan

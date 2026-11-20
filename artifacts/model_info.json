@@ -1,0 +1,33 @@
+{
+  "model": "Ridge regression (alpha=3.0) with StandardScaler, one model per commodity",
+  "features": [
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_7",
+    "lag_14",
+    "lag_21",
+    "lag_30",
+    "roll_mean_7",
+    "roll_mean_14",
+    "roll_mean_30",
+    "roll_std_7",
+    "mom_7",
+    "mom_30",
+    "doy_sin1",
+    "doy_cos1",
+    "doy_sin2",
+    "doy_cos2",
+    "dow_sin",
+    "dow_cos"
+  ],
+  "horizon_days": 7,
+  "backtest": "Rolling-origin backtest, 28 consecutive origins, 7-day recursive forecasts, evaluated on unseen actual prices",
+  "trained_on": "Synthetic Agmarknet-style sample prices",
+  "data_end": "2026-11-20",
+  "built_at": "2026-11-20T21:47:00",
+  "avg_mape": 1.4,
+  "avg_mape_h7": 1.77,
+  "avg_r2": 0.7824,
+  "total_predictions": 15876
+}
