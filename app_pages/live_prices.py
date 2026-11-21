@@ -22,7 +22,7 @@ if status["snapshot"]:
         "itself; the snapshot is refreshed from a local Indian connection."
     )
 
-if not status["configured"]:
+if not status["configured"] and not status["snapshot"]:
     st.warning(
         "Live sync is not configured, so new prices cannot be fetched. "
         "Cached live rows below are still used if present; otherwise the app uses "
@@ -59,22 +59,20 @@ elif status["db_error"]:
         icon=":material/database:",
     )
 
-left, right = st.columns([1, 3], vertical_alignment="center")
-with left:
-    sync_clicked = st.button(
-        "Sync now", type="primary", icon=":material/sync:", width="stretch"
-    )
-with right:
-    st.caption(
-        "Fetches the current data.gov.in snapshot and upserts it into the app database "
-        "(Turso, or the local libSQL file when Turso is not configured). "
-        "Already-cached dates are updated, not duplicated."
-    )
+if status["configured"]:
+    left, right = st.columns([1, 3], vertical_alignment="center")
+    with left:
+        sync_clicked = st.button(
+            "Sync now", type="primary", icon=":material/sync:", width="stretch"
+        )
+    with right:
+        st.caption(
+            "Fetches the current data.gov.in snapshot and upserts it into the app database "
+            "(Turso, or the local libSQL file when Turso is not configured). "
+            "Already-cached dates are updated, not duplicated."
+        )
 
-if sync_clicked:
-    if not status["configured"]:
-        st.error("Add DATA_GOV_API_KEY to .streamlit/secrets.toml first.")
-    else:
+    if sync_clicked:
         with st.spinner("Fetching current mandi prices from Agmarknet..."):
             st.session_state["live_sync_result"] = sync_live_prices()
         st.rerun()
