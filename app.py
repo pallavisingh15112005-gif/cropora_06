@@ -8,7 +8,7 @@ from __future__ import annotations
 import streamlit as st
 
 from data_layer import load_locations
-from ui import inject_styles
+from theme import inject_styles
 
 st.set_page_config(
     page_title="Cropora AI",
