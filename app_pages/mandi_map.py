@@ -8,12 +8,9 @@ from data_layer import (
     location_coords,
     mandi_rows_for,
 )
-from ui import data_note, mandi_map, page_header, section
+from ui import mandi_map, page_header, section
 
-page_header(
-    "Mandi map & distance",
-    "See which mandis trade your crop, how far they are, and what they are paying today.",
-)
+page_header("Mandi map & distance")
 
 summary = forecast_summary()
 crops = sorted(summary["commodity"].unique())
@@ -46,7 +43,6 @@ st.plotly_chart(
     width="stretch",
     config={"displayModeBar": False},
 )
-st.caption("Map tiles © OpenStreetMap contributors. The location table below works without a map connection.")
 
 section("Distances and prices", f"From your selected location: {location}.")
 table = rows[
@@ -64,4 +60,3 @@ st.caption(
     "Distance is straight-line (Haversine) from your selected location, not road distance. "
     "Transport cost uses an assumed ₹0.10 per quintal per km."
 )
-data_note()
