@@ -80,10 +80,7 @@ if status["last_error"] and status["configured"] and can_sync_here():
     st.caption(f"Last sync error: {status['last_error']}")
 
 st.write("")
-section(
-    "Cached live prices",
-    "Latest Agmarknet snapshot per commodity and mandi. The sample data fills any pair without a live row.",
-)
+section("Cached live prices")
 
 live = live_prices()
 if live.empty:
