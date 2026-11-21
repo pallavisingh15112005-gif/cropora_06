@@ -8,12 +8,13 @@ from __future__ import annotations
 import streamlit as st
 
 from data_layer import haversine_km, load_locations
+from geocode import reverse_location
 from theme import inject_styles
 
 st.set_page_config(
     page_title="Cropora AI",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 inject_styles()
 
@@ -40,36 +41,26 @@ pages = {
     ],
 }
 
-flat_pages = [page for group in pages.values() for page in group]
-page_titles = [page.title for page in flat_pages]
+pg = st.navigation(pages, position="sidebar")
 
 locations_df = load_locations()
 locations = locations_df["location"].tolist()
 default_index = locations.index("Ludhiana") if "Ludhiana" in locations else 0
 
+gps = None
 if "location" not in st.session_state:
     try:
-        plat = float(st.query_params.get("lat"))
-        plon = float(st.query_params.get("lon"))
+        gps = float(st.query_params.get("lat")), float(st.query_params.get("lon"))
     except (TypeError, ValueError):
-        plat = plon = None
-    if plat is not None and plon is not None:
+        gps = None
+    if gps:
         nearest = min(
             locations_df.itertuples(),
-            key=lambda r: haversine_km(plat, plon, r.latitude, r.longitude),
+            key=lambda r: haversine_km(gps[0], gps[1], r.latitude, r.longitude),
         )
         default_index = locations.index(nearest.location)
 
-pg = st.navigation(pages, position="hidden")
-
-segment = (st.context.url or "/").split("?")[0].rstrip("/").split("/")[-1]
-current = next(
-    (i for i, page in enumerate(flat_pages) if page.url_path == segment), 0
-)
-nav_col, loc_col = st.columns([1.2, 1], vertical_alignment="bottom")
-with nav_col:
-    choice = st.selectbox("Page", page_titles, index=current)
-with loc_col:
+with st.sidebar:
     st.selectbox(
         "Your location",
         locations,
@@ -77,7 +68,9 @@ with loc_col:
         key="location",
         help="Used to calculate mandi distances and transport costs.",
     )
-if choice != page_titles[current]:
-    st.switch_page(flat_pages[page_titles.index(choice)])
+    if gps:
+        label = reverse_location(gps[0], gps[1])
+        if label:
+            st.caption(label)
 
 pg.run()
