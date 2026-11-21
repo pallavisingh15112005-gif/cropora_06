@@ -7,12 +7,9 @@ from data_layer import (
     forecast_summary,
     mandi_rows_for,
 )
-from ui import data_note, mandi_price_chart, page_header, section
+from ui import mandi_price_chart, page_header, section
 
-page_header(
-    "Compare mandis",
-    "The same crop can fetch very different prices nearby. Compare before you load the truck.",
-)
+page_header("Compare mandis")
 
 summary = forecast_summary()
 crops = sorted(summary["commodity"].unique())
@@ -55,9 +52,8 @@ st.plotly_chart(
     width="stretch",
     config={"displayModeBar": False},
 )
-st.caption("Bars show today's modal price. Diamonds show the day-7 forecast.")
 
-section("Full comparison", f"{crop} from {location}, ranked by net price after estimated transport.")
+section("Full comparison")
 table = rows[
     ["mandi", "state", "distance_km", "modal_price", "transport_cost", "net_price_now", "forecast_price", "net_price_d7", "change_pct"]
 ].copy()
@@ -75,4 +71,3 @@ st.caption(
     "Transport is an estimate: ₹0.10 per quintal per km, straight-line distance. "
     "Check actual freight and mandi charges before deciding."
 )
-data_note()
