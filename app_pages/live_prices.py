@@ -1,9 +1,9 @@
 import pandas as pd
 import streamlit as st
 
-from agmarknet import SOURCE, can_sync_here, get_status, sync_live_prices
+from agmarknet import can_sync_here, get_status, sync_live_prices
 from data_layer import fmt_inr, live_prices
-from ui import data_note, page_header, section
+from ui import page_header, section
 
 page_header("Live mandi prices")
 
@@ -136,11 +136,3 @@ else:
         mime="text/csv",
         icon=":material/download:",
     )
-    st.caption(
-        f"Source: {SOURCE} via data.gov.in. Where a mandi reports several varieties, "
-        "the modal price is their median and min/max cover the reported range. "
-        "Live prices anchor today's price and the 7-day forecast level across the app; "
-        "the forecasting model itself is trained on the sample history."
-    )
-
-data_note()
