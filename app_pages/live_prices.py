@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from agmarknet import SOURCE, get_status, sync_live_prices
+from agmarknet import SOURCE, can_sync_here, get_status, sync_live_prices
 from data_layer import fmt_inr, live_prices
 from ui import data_note, page_header, section
 
@@ -59,7 +59,7 @@ elif status["db_error"]:
         icon=":material/database:",
     )
 
-if status["configured"]:
+if status["configured"] and can_sync_here():
     left, right = st.columns([1, 3], vertical_alignment="center")
     with left:
         sync_clicked = st.button(
@@ -89,7 +89,7 @@ if result:
     else:
         st.error(result.get("message", "Live sync failed."))
 
-if status["last_error"] and status["configured"]:
+if status["last_error"] and status["configured"] and can_sync_here():
     st.caption(f"Last sync error: {status['last_error']}")
 
 st.write("")

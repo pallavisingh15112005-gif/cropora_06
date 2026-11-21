@@ -77,6 +77,14 @@ def is_configured() -> bool:
     return bool(api_key())
 
 
+_CLOUD_ENV_VARS = ("RENDER", "STREAMLIT_SHARING_MODE", "K_SERVICE")
+
+
+def can_sync_here() -> bool:
+    """data.gov.in only answers hosts on Indian networks, so cloud hosts cannot fetch."""
+    return not any(os.environ.get(var) for var in _CLOUD_ENV_VARS)
+
+
 def _load_snapshot() -> tuple[pd.DataFrame, str | None]:
     try:
         payload = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
