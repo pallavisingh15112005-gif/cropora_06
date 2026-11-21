@@ -49,13 +49,14 @@ locations_df = load_locations()
 locations = locations_df["location"].tolist()
 default_index = locations.index("Ludhiana") if "Ludhiana" in locations else 0
 
-gps = None
-if "location" not in st.session_state:
+gps = st.session_state.get("gps")
+if gps is None and "location" not in st.session_state:
     try:
         gps = float(st.query_params.get("lat")), float(st.query_params.get("lon"))
     except (TypeError, ValueError):
         gps = None
     if gps:
+        st.session_state["gps"] = gps
         nearest = min(
             locations_df.itertuples(),
             key=lambda r: haversine_km(gps[0], gps[1], r.latitude, r.longitude),

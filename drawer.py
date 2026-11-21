@@ -1,10 +1,9 @@
 """Auto-close the sidebar drawer after a page is picked from it."""
 
 import streamlit as st
-import streamlit.components.v1 as components
 
-_JS = """
-<script>
+_HTML = """<!doctype html>
+<html><body><script>
 (function () {
   var doc;
   try { doc = window.parent.document; } catch (e) { return; }
@@ -34,9 +33,9 @@ _JS = """
     })();
   }, true);
 })();
-</script>
+</script></body></html>
 """
 
 
 def inject_autoclose() -> None:
-    components.html(_JS, height=0)
+    st.iframe(_HTML, height=1)
