@@ -9,19 +9,6 @@ page_header("Live mandi prices")
 
 status = get_status()
 
-if status["snapshot"]:
-    synced = pd.to_datetime(status["snapshot_synced_at"], errors="coerce")
-    when = (
-        f"{synced:%d %b %Y, %H:%M} IST"
-        if pd.notna(synced)
-        else "an earlier session"
-    )
-    st.caption(
-        f"Showing the bundled Agmarknet snapshot synced {when}. data.gov.in answers "
-        "only from Indian networks, so this deployment cannot fetch live prices "
-        "itself; the snapshot is refreshed from a local Indian connection."
-    )
-
 if not status["configured"] and not status["snapshot"]:
     st.warning(
         "Live sync is not configured, so new prices cannot be fetched. "
