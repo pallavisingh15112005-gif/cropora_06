@@ -58,6 +58,13 @@ def main() -> int:
         "source": agmarknet.SOURCE,
         "rows": rows,
     }
+    try:
+        previous = json.loads(OUT.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = {}
+    if previous.get("rows") == rows:
+        print("Snapshot unchanged; keeping the existing file.")
+        return 0
     OUT.write_text(json.dumps(payload, indent=1), encoding="utf-8")
     print(
         f"Wrote {len(rows)} rows ({recent['commodity'].nunique()} commodities, "
