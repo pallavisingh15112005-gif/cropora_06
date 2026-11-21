@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from data_layer import load_locations
+from data_layer import haversine_km, load_locations
 from theme import inject_styles
 
 st.set_page_config(
@@ -43,8 +43,22 @@ pages = {
 flat_pages = [page for group in pages.values() for page in group]
 page_titles = [page.title for page in flat_pages]
 
-locations = load_locations()["location"].tolist()
+locations_df = load_locations()
+locations = locations_df["location"].tolist()
 default_index = locations.index("Ludhiana") if "Ludhiana" in locations else 0
+
+if "location" not in st.session_state:
+    try:
+        plat = float(st.query_params.get("lat"))
+        plon = float(st.query_params.get("lon"))
+    except (TypeError, ValueError):
+        plat = plon = None
+    if plat is not None and plon is not None:
+        nearest = min(
+            locations_df.itertuples(),
+            key=lambda r: haversine_km(plat, plon, r.latitude, r.longitude),
+        )
+        default_index = locations.index(nearest.location)
 
 pg = st.navigation(pages, position="hidden")
 
