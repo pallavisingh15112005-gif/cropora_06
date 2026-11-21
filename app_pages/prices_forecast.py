@@ -11,12 +11,9 @@ from data_layer import (
     mandi_name,
     mandi_rows_for,
 )
-from ui import data_note, page_header, price_forecast_chart, section
+from ui import page_header, price_forecast_chart, section
 
-page_header(
-    "Prices & 7-day forecast",
-    "Latest modal prices (Agmarknet when synced, the sample dataset otherwise) with a seven-day ridge-regression forecast.",
-)
+page_header("Prices & 7-day forecast")
 
 summary = forecast_summary()
 crops = sorted(summary["commodity"].unique())
@@ -59,7 +56,6 @@ with cards[2]:
 with cards[3]:
     with st.container(border=True):
         st.metric("Model MAPE (7-day)", f"{metric_row['mape_h7']:.2f}%")
-        st.caption(f"R² {metric_row['r2']:.2f} on unseen backtest data")
 
 st.write("")
 st.plotly_chart(
@@ -97,10 +93,9 @@ with right:
 - **Range:** the shaded band is an estimated 80% interval, not a guarantee.
 """
     )
-    data_note()
 
 st.write("")
-section("Other mandis for this crop", "Latest prices sorted by price.")
+section("Other mandis for this crop")
 others = crop_rows.sort_values("modal_price", ascending=False)[
     ["mandi", "state", "modal_price", "forecast_price", "change_pct"]
 ].copy()
