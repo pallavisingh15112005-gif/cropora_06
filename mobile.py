@@ -14,6 +14,9 @@ html, body { overflow-x: hidden; }
   h1 { font-size: 2rem !important; line-height: 1.2 !important; }
   [data-testid="stVerticalBlock"], [data-testid="stElementContainer"] { min-width: 0 !important; }
   [data-testid="stImage"] img { max-width: 100% !important; height: auto !important; }
+  [data-testid="stHeader"] {
+    background: linear-gradient(180deg, #FBF7EC 62%, rgba(251, 247, 236, 0)) !important;
+  }
 }
 </style>
 """
