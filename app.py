@@ -10,6 +10,7 @@ import streamlit as st
 from data_layer import haversine_km, load_locations
 from drawer import inject_autoclose
 from geocode import reverse_location
+from mobile import inject_mobile_css
 from theme import inject_styles
 
 st.set_page_config(
@@ -18,6 +19,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 inject_styles()
+inject_mobile_css()
 inject_autoclose()
 
 pages = {
