@@ -15,7 +15,13 @@ html, body { overflow-x: hidden; }
   [data-testid="stVerticalBlock"], [data-testid="stElementContainer"] { min-width: 0 !important; }
   [data-testid="stImage"] img { max-width: 100% !important; height: auto !important; }
   [data-testid="stHeader"] {
-    background: linear-gradient(180deg, #FBF7EC 62%, rgba(251, 247, 236, 0)) !important;
+    background: transparent !important;
+  }
+  [data-testid="stExpandSidebarButton"],
+  [data-testid="stToolbarActionButton"] > button,
+  [data-testid="stMainMenuButton"] {
+    background: rgba(251, 247, 236, 0.86) !important;
+    border-radius: 999px !important;
   }
 }
 </style>
